@@ -83,106 +83,154 @@ const ProductDetailPage: React.FC = () => {
   }
 
   return (
-    <PageWrapper title="Product Details">
-      <div className="mb-4">
+    <PageWrapper title="Product Showcase">
+      <div className="mb-0 flex items-center justify-between">
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate(-1)}
-          className="mb-4"
+          className="!flex items-center gap-2 border-none shadow-none text-slate-500 hover:text-blue-600 px-0"
         >
-          Back
+          Back to list
         </Button>
+        <Space>
+          <Button
+            type="primary"
+            size="large"
+            icon={<EditOutlined />}
+            onClick={() => setDrawerOpen(true)}
+            className="bg-gradient-to-r from-blue-600 to-indigo-700 border-none hover:opacity-90 shadow-md shadow-blue-200"
+          >
+            Edit Specs
+          </Button>
+          <Button
+            size="large"
+            className="border-slate-200 text-slate-600"
+          >
+            Share
+          </Button>
+        </Space>
       </div>
 
-      <Row gutter={[32, 32]}>
+      <Divider className="my-6 opacity-50" />
+
+      <Row gutter={[48, 48]}>
         {/* Left Column: Image Gallery */}
-        <Col xs={24} md={10}>
-          <ProductImageGallery
-            images={product.images}
-            thumbnail={product.thumbnail}
-            title={product.title}
-          />
+        <Col xs={24} lg={11}>
+          <div className="sticky top-8">
+            <ProductImageGallery
+              images={product.images}
+              thumbnail={product.thumbnail}
+              title={product.title}
+            />
+          </div>
         </Col>
 
         {/* Right Column: Product Info */}
-        <Col xs={24} md={14}>
-          <div className="flex flex-col gap-4">
+        <Col xs={24} lg={13}>
+          <div className="flex flex-col gap-6">
             <div>
-              <Title level={2} className="m-0">
-                {product.title}
-              </Title>
-              <Space className="mt-2">
-                <Tag color="purple">{product.category}</Tag>
-                <Tag color="gold">{product.brand}</Tag>
+              <Space className="mb-3">
+                <Tag color="blue" className="!rounded-full !px-3 font-semibold uppercase text-[10px] tracking-widest border-none bg-blue-50 text-blue-600">
+                  {product!.category}
+                </Tag>
+                {product!.brand && (
+                  <Tag className="!rounded-full !px-3 font-semibold uppercase text-[10px] tracking-widest border-none bg-slate-100 text-slate-500">
+                    {product!.brand}
+                  </Tag>
+                )}
               </Space>
+              <Title level={1} className="!m-0 !text-4xl !font-extrabold tracking-tight text-slate-900 leading-tight">
+                {product!.title}
+              </Title>
+              <div className="mt-4 flex items-center gap-4">
+                <Space align="center" className="bg-amber-50 px-3 py-1 rounded-full border border-amber-100">
+                  <Rate disabled allowHalf defaultValue={product!.rating} style={{ fontSize: 16 }} className="text-amber-500" />
+                  <Text strong className="text-amber-700 mt-1">
+                    {product!.rating}
+                  </Text>
+                </Space>
+                <Text className="text-slate-400 text-sm">
+                  Verified Purchase
+                </Text>
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-1">
-              {product.tags.map((tag) => (
-                <Tag key={tag} color="blue">
-                  {tag}
+            <div className="p-6 bg-slate-50/50 rounded-2xl border border-slate-100">
+              <div className="flex items-baseline gap-3">
+                <Text className="text-4xl font-black text-slate-900">
+                  ${product!.price ? product!.price.toFixed(2) : '0.00'}
+                </Text>
+                {product!.discountPercentage > 0 && (
+                  <div className="flex flex-col">
+                    <Text delete className="text-slate-400 text-sm">
+                      ${(product!.price / (1 - product!.discountPercentage / 100)).toFixed(2)}
+                    </Text>
+                    <Tag color="red" className="!m-0 !rounded-full text-[11px] font-bold border-none">
+                      SAVE {product!.discountPercentage}%
+                    </Tag>
+                  </div>
+                )}
+              </div>
+              
+              <div className="mt-6">
+                <Badge
+                  status={
+                    product!.stock > 10
+                      ? 'success'
+                      : product!.stock > 0
+                      ? 'warning'
+                      : 'error'
+                  }
+                  text={
+                    <Text className={`font-semibold ${
+                      product!.stock > 10 ? 'text-emerald-600' : 'text-amber-600'
+                    }`}>
+                      {product!.stock > 0
+                        ? `${product!.stock} Units left in stock`
+                        : 'Currently Out of Stock'}
+                    </Text>
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="mt-2">
+              <Title level={5} className="!uppercase !text-xs !font-bold !tracking-widest !text-slate-400 !mb-3">
+                Description
+              </Title>
+              <Paragraph className="text-slate-600 leading-relaxed text-lg">
+                {product!.description}
+              </Paragraph>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {product!.tags?.map((tag) => (
+                <Tag key={tag} className="!bg-white !border-slate-100 !text-slate-500 !rounded-lg !px-3 font-medium">
+                  #{tag}
                 </Tag>
               ))}
             </div>
 
-            <div className="mt-2">
-              <Space align="center">
-                <Text className="text-3xl font-bold text-blue-600">
-                  ${product.price}
-                </Text>
-                {product.discountPercentage > 0 && (
-                  <Tag color="red" className="ml-2">
-                    -{product.discountPercentage}% OFF
-                  </Tag>
-                )}
-              </Space>
+            <Divider className="my-2" />
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+               <div className="flex flex-col">
+                 <Text className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Weight</Text>
+                 <Text className="font-semibold text-slate-700">{product!.weight}g</Text>
+               </div>
+               <div className="flex flex-col">
+                 <Text className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Warranty</Text>
+                 <Text className="font-semibold text-slate-700">{product!.warrantyInformation}</Text>
+               </div>
+               <div className="flex flex-col">
+                 <Text className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">Shipping</Text>
+                 <Text className="font-semibold text-slate-700">{product!.shippingInformation}</Text>
+               </div>
+               <div className="flex flex-col">
+                 <Text className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">SKU</Text>
+                 <Text className="font-semibold text-slate-700">{product!.sku}</Text>
+               </div>
             </div>
-
-            <Space align="center">
-              <Rate disabled allowHalf defaultValue={product.rating} />
-              <Text strong className="text-gray-500">
-                ({product.rating})
-              </Text>
-            </Space>
-
-            <div>
-              <Badge
-                status={
-                  product.stock > 10
-                    ? 'success'
-                    : product.stock > 0
-                    ? 'warning'
-                    : 'error'
-                }
-                text={
-                  <Text strong className="text-lg">
-                    {product.stock > 0
-                      ? `${product.stock} in stock`
-                      : 'Out of Stock'}
-                  </Text>
-                }
-              />
-            </div>
-
-            <Divider />
-
-            <div>
-              <Title level={4}>Description</Title>
-              <Paragraph className="text-gray-600 leading-relaxed">
-                {product.description}
-              </Paragraph>
-            </div>
-
-            <Space className="mt-6">
-              <Button
-                type="primary"
-                size="large"
-                icon={<EditOutlined />}
-                onClick={() => setDrawerOpen(true)}
-              >
-                Edit Product
-              </Button>
-            </Space>
           </div>
         </Col>
       </Row>

@@ -123,68 +123,79 @@ const ProductListPage: React.FC = () => {
   }
 
   return (
-    <PageWrapper title="Products">
-      <div className="mb-6">
-        <Row gutter={[16, 16]} align="middle">
-          <Col xs={24} md={12}>
-            <Search
-              placeholder="Search products..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              allowClear
-              enterButton
-              size="large"
-            />
+    <PageWrapper title="Product Catalog">
+      <div className="mb-8 p-6 bg-white/50 rounded-2xl border border-slate-100 shadow-sm">
+        <Row gutter={[24, 24]} align="middle">
+          <Col xs={24} lg={14}>
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Search Products</span>
+              <Search
+                placeholder="Find something special..."
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                allowClear
+                enterButton="Search"
+                size="large"
+                className="custom-search"
+              />
+            </div>
           </Col>
-          <Col xs={24} md={12} className="md:text-right">
-            <Select
-              placeholder="All Categories"
-              style={{ width: 200 }}
-              allowClear
-              options={categoriesData?.map((cat) => ({
-                value: typeof cat === 'string' ? cat : cat.slug,
-                label: typeof cat === 'string' ? cat : cat.name,
-              }))}
-              value={selectedCategory || undefined}
-              onChange={(value) => {
-                dispatch(setSelectedCategory(value || ''));
-                dispatch(setCurrentPage(1));
-              }}
-              size="large"
-            />
+          <Col xs={24} lg={10}>
+            <div className="flex flex-col gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Category Filter</span>
+              <Select
+                placeholder="All Categories"
+                className="w-full"
+                allowClear
+                options={categoriesData?.map((cat) => ({
+                  value: typeof cat === 'string' ? cat : cat.slug,
+                  label: typeof cat === 'string' ? cat : (cat.name || cat.slug),
+                }))}
+                value={selectedCategory || undefined}
+                onChange={(value) => {
+                  dispatch(setSelectedCategory(value || ''));
+                  dispatch(setCurrentPage(1));
+                }}
+                size="large"
+              />
+            </div>
           </Col>
         </Row>
       </div>
 
       {isLoading ? (
-        <div className="flex flex-col gap-2">
-          {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton.Button
+        <div className="flex flex-col gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton
               key={i}
               active
-              size="large"
-              shape="square"
-              style={{ width: '100%', height: 48 }}
+              avatar={{ shape: 'square', size: 'large' }}
+              paragraph={{ rows: 1 }}
+              className="bg-white p-4 rounded-xl shadow-sm border border-slate-100"
             />
           ))}
         </div>
       ) : (
         <div className="relative">
           {isFetching && !isLoading && (
-            <div className="absolute top-2 right-2 z-10">
-              <Spin size="small" />
+            <div className="absolute -top-12 right-0 z-10 flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold animate-pulse border border-blue-100">
+              <Spin size="small" /> Updating...
             </div>
           )}
-          <Table
-            columns={columns}
-            dataSource={data?.products || []}
-            rowKey="id"
-            pagination={false}
-            className={`shadow-sm border rounded-lg overflow-hidden transition-opacity ${
-              isFetching ? 'opacity-50' : 'opacity-100'
-            }`}
-          />
-          <div className="mt-6 flex justify-end">
+          <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+            <Table
+              columns={columns}
+              dataSource={data?.products || []}
+              rowKey="id"
+              pagination={false}
+              rowClassName="group cursor-pointer hover:bg-slate-50/80 transition-colors"
+              onRow={(record) => ({
+                onClick: () => navigate(`/products/${record.id}`),
+              })}
+              className="custom-table"
+            />
+          </div>
+          <div className="mt-8 flex justify-center sm:justify-end bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <Pagination
               current={currentPage}
               pageSize={pageSize}
@@ -195,7 +206,11 @@ const ProductListPage: React.FC = () => {
                 dispatch(setCurrentPage(1));
               }}
               showSizeChanger
-              showTotal={(total) => `Total ${total} products`}
+              showTotal={(total) => (
+                <span className="font-medium text-slate-500">
+                  Total <span className="text-blue-600 font-bold">{total}</span> items
+                </span>
+              )}
             />
           </div>
         </div>
